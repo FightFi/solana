@@ -1,4 +1,5 @@
 use anchor_lang::prelude::*;
+use anchor_spl::token::Mint;
 use anchor_spl::token::Token;
 use anchor_spl::associated_token::AssociatedToken;
 use anchor_spl::token::TokenAccount;
@@ -35,8 +36,7 @@ pub struct Initialize<'info> {
     )]
     pub state: Account<'info, State>,
     
-    /// CHECK: We validate this is the correct mint in the instruction
-    pub fight_token_mint: AccountInfo<'info>,
+    pub fight_token_mint: Account<'info, Mint>,
     
     #[account(
         init,
