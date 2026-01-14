@@ -78,11 +78,10 @@ describe("staking", () => {
 
     // For localnet, we'll create a test mint if needed
     // In production, you would use the actual FIGHT_TOKEN_MINT
-    try {
-      // Try to get the mint account info
-      await provider.connection.getAccountInfo(FIGHT_TOKEN_MINT);
+    const mintAccountInfo = await provider.connection.getAccountInfo(FIGHT_TOKEN_MINT);
+    if (mintAccountInfo) {
       fightTokenMint = FIGHT_TOKEN_MINT;
-    } catch (error) {
+    } else {
       // If mint doesn't exist, create a test mint
       console.log("Creating test mint for localnet...");
       fightTokenMint = await createMint(
