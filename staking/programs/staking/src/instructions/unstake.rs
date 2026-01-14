@@ -63,6 +63,7 @@ pub fn unstake(ctx: Context<Unstake>, amount: u64) -> Result<()> {
 #[derive(Accounts)]
 pub struct Unstake<'info> {
     #[account(
+        mut,
         seeds = [seeds::STATE],
         bump = state.bump
     )]
@@ -86,19 +87,19 @@ pub struct Unstake<'info> {
     )]
     pub user_token_account: Account<'info, TokenAccount>,
     
-    #[account(
-        mut,
-        seeds = [seeds::VAULT, state.fight_token_mint.as_ref()],
-        bump
-    )]
-    pub vault_token_account: Account<'info, TokenAccount>,
-    
     /// CHECK: Vault authority PDA
     #[account(
         seeds = [seeds::VAULT, state.fight_token_mint.as_ref()],
         bump
     )]
     pub vault_authority: AccountInfo<'info>,
-    
+
+    #[account(
+        mut,
+        constraint = vault_token_account.mint == state.fight_token_mint @ StakingError::InvalidTokenMint,
+        constraint = vault_token_account.owner == vault_authority.key() @ StakingError::InvalidTokenAccount,
+    )]
+    pub vault_token_account: Account<'info, TokenAccount>,
+
     pub token_program: Program<'info, Token>,
 }
