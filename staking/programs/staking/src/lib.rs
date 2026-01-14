@@ -45,4 +45,5 @@ pub mod staking {
 }
 
 // Re-export instruction contexts
+#[allow(ambiguous_glob_reexports)]
 pub use instructions::*;
