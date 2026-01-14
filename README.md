@@ -231,6 +231,7 @@ The test suite includes 16 integration tests covering:
 ## Documentation
 
 - [Token Setup Guide](./staking/docs/TOKEN_SETUP.md) - CLI instructions for creating tokens, minting, and setup
+- [Deployment Guide](./staking/docs/DEPLOYMENT.md) - Deploying to localnet, testnet, and mainnet
 
 ## License
 
