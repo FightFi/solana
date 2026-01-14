@@ -74,6 +74,22 @@ staking/programs/staking/src/
 - **Wallet:** `~/.config/solana/id.json`
 - **Test framework:** Mocha + Chai (`tests/staking.ts`)
 
+## Known Issues & Workarounds
+
+### blake3 Version Pin
+`blake3` is pinned to `=1.5.5` in `Cargo.toml`. Do not remove this pin. Newer versions pull in `constant_time_eq` v0.4.2 which requires Rust edition 2024, but Solana's `cargo-build-sbf` bundles Rust 1.84.1 which doesn't support it.
+
+### IDL Build Feature
+The `idl-build` feature must include `anchor-spl/idl-build`:
+```toml
+idl-build = ["anchor-lang/idl-build", "anchor-spl/idl-build"]
+```
+Without this, IDL generation fails with cryptic errors about missing `DISCRIMINATOR` and `create_type`.
+
+### Test Setup
+- Run `yarn install` before `anchor test` to install TypeScript dependencies
+- Tests create a mock FIGHT token mint on localnet since the real mint (`8f62NyJG...`) only exists on mainnet/devnet
+
 ## Reference
 
 Original Solidity contract kept at `staking/staking.sol` for feature parity verification.
