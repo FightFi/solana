@@ -85,6 +85,116 @@ staking/programs/staking/src/
 - **PDA Vaults:** Tokens held in program-controlled vault accounts
 - **Per-user Tracking:** Individual stake balances tracked via UserStake PDAs
 
+## Deployment
+
+### Localnet (default)
+```bash
+cd staking
+anchor test  # Builds, deploys, and tests automatically
+```
+
+### Devnet
+```bash
+cd staking
+solana config set --url devnet
+anchor build
+anchor deploy --provider.cluster devnet
+```
+
+### Mainnet
+```bash
+cd staking
+solana config set --url mainnet-beta
+anchor build
+anchor deploy --provider.cluster mainnet
+```
+
+## PDA Derivation
+
+For client integration, derive PDAs as follows:
+
+| Account | Seeds | Description |
+|---------|-------|-------------|
+| **State** | `["state"]` | Global program state (singleton) |
+| **Vault** | `["vault", mint_pubkey]` | Token account holding staked tokens |
+| **UserStake** | `["user_stake", user_pubkey]` | Per-user stake balance |
+
+### JavaScript Example
+
+```typescript
+import { PublicKey } from "@solana/web3.js";
+
+const PROGRAM_ID = new PublicKey("<PROGRAM_ID>");
+const FIGHT_MINT = new PublicKey("<FIGHT_TOKEN_MINT>");
+
+// State PDA
+const [statePda] = PublicKey.findProgramAddressSync(
+  [Buffer.from("state")],
+  PROGRAM_ID
+);
+
+// Vault PDA
+const [vaultPda] = PublicKey.findProgramAddressSync(
+  [Buffer.from("vault"), FIGHT_MINT.toBuffer()],
+  PROGRAM_ID
+);
+
+// User Stake PDA
+const [userStakePda] = PublicKey.findProgramAddressSync(
+  [Buffer.from("user_stake"), userPublicKey.toBuffer()],
+  PROGRAM_ID
+);
+```
+
+## Client Usage
+
+### Stake Tokens
+
+```typescript
+import { Program } from "@coral-xyz/anchor";
+import { getAssociatedTokenAddress } from "@solana/spl-token";
+
+const userTokenAccount = await getAssociatedTokenAddress(FIGHT_MINT, userPublicKey);
+
+await program.methods
+  .stake(new BN(1000 * 10 ** 9)) // 1000 tokens (9 decimals)
+  .accounts({
+    state: statePda,
+    userStake: userStakePda,
+    user: userPublicKey,
+    userTokenAccount: userTokenAccount,
+    vaultAuthority: vaultPda,
+    vaultTokenAccount: vaultTokenAccount,
+    tokenProgram: TOKEN_PROGRAM_ID,
+    systemProgram: SystemProgram.programId,
+  })
+  .rpc();
+```
+
+### Unstake Tokens
+
+```typescript
+await program.methods
+  .unstake(new BN(500 * 10 ** 9)) // 500 tokens
+  .accounts({
+    state: statePda,
+    userStake: userStakePda,
+    user: userPublicKey,
+    userTokenAccount: userTokenAccount,
+    vaultAuthority: vaultPda,
+    vaultTokenAccount: vaultTokenAccount,
+    tokenProgram: TOKEN_PROGRAM_ID,
+  })
+  .rpc();
+```
+
+### Read User Balance
+
+```typescript
+const userStake = await program.account.userStake.fetch(userStakePda);
+console.log("Staked balance:", userStake.balance.toNumber());
+```
+
 ## Program ID
 
 ```
@@ -96,3 +206,28 @@ staking/programs/staking/src/
 ```
 8f62NyJGo7He5uWeveTA2JJQf4xzf8aqxkmzxRQ3mxfU
 ```
+
+## Security
+
+This program has been audited. See [AUDIT_REPORT.md](./reports/AUDIT_REPORT.md) for details.
+
+Key security features:
+- Users can always unstake even when contract is paused
+- Owner-only pause/unpause controls
+- Zero-amount transactions rejected
+- Insufficient balance checks on unstake
+
+## Test Coverage
+
+See [TEST_COVERAGE_REPORT.md](./reports/TEST_COVERAGE_REPORT.md) for detailed test coverage analysis.
+
+The test suite includes 16 integration tests covering:
+- Core functionality (initialize, stake, unstake)
+- Pause/unpause controls
+- Authorization checks
+- Error handling (zero amounts, insufficient balance)
+- Edge cases (multi-user, full withdrawal)
+
+## License
+
+MIT
