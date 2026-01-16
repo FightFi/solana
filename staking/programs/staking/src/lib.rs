@@ -12,6 +12,16 @@ pub use state::*;
 pub use errors::*;
 pub use events::*;
 
+// Program ID is selected at compile time based on target network
+// Build with: anchor build -- --features testnet
+// Build with: anchor build -- --features mainnet
+#[cfg(feature = "mainnet")]
+declare_id!("YOUR_MAINNET_PROGRAM_ID_HERE");
+
+#[cfg(feature = "testnet")]
+declare_id!("DVDvrhK9vFQ8JtXpv3pSskSQahuuQKPuWpJakHT4EJne");
+
+#[cfg(not(any(feature = "mainnet", feature = "testnet")))]
 declare_id!("9aZRVnxzy8kRiq8mHcfFBj1BX2hY7ixUJH24Q4aYjycd");
 
 #[program]
@@ -45,4 +55,5 @@ pub mod staking {
 }
 
 // Re-export instruction contexts
+#[allow(ambiguous_glob_reexports)]
 pub use instructions::*;
