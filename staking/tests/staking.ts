@@ -12,9 +12,6 @@ import {
 import { Keypair, PublicKey, SystemProgram } from "@solana/web3.js";
 import { expect } from "chai";
 
-// FIGHT Token Mint address
-const FIGHT_TOKEN_MINT = new PublicKey("8f62NyJGo7He5uWeveTA2JJQf4xzf8aqxkmzxRQ3mxfU");
-
 describe("staking", () => {
   // Configure the client to use the local cluster
   anchor.setProvider(anchor.AnchorProvider.env());
@@ -76,22 +73,15 @@ describe("staking", () => {
     // Wait for airdrops to confirm
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    // For localnet, we'll create a test mint if needed
-    // In production, you would use the actual FIGHT_TOKEN_MINT
-    const mintAccountInfo = await provider.connection.getAccountInfo(FIGHT_TOKEN_MINT);
-    if (mintAccountInfo) {
-      fightTokenMint = FIGHT_TOKEN_MINT;
-    } else {
-      // If mint doesn't exist, create a test mint
-      console.log("Creating test mint for localnet...");
-      fightTokenMint = await createMint(
-        provider.connection,
-        owner,
-        owner.publicKey,
-        null,
-        9 // 9 decimals
-      );
-    }
+    // Create a test mint for localnet testing
+    console.log("Creating test FIGHT token mint...");
+    fightTokenMint = await createMint(
+      provider.connection,
+      owner,
+      owner.publicKey,
+      null,
+      9 // 9 decimals
+    );
 
     // Get PDAs
     [statePda] = await getStatePda();

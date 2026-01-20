@@ -8,15 +8,13 @@ Solana staking program built with Anchor framework (Rust). Users stake FIGHT tok
 
 - **Language:** Rust (Anchor v0.32.1), TypeScript (tests)
 - **Rust Version:** 1.89.0 (pinned in `rust-toolchain.toml`)
-- **FIGHT Token Mint:** `8f62NyJGo7He5uWeveTA2JJQf4xzf8aqxkmzxRQ3mxfU`
 
-### Program IDs
+### Program IDs & Token Addresses
 
-| Network   | Program ID                                       |
-|-----------|--------------------------------------------------|
-| Localnet  | `9aZRVnxzy8kRiq8mHcfFBj1BX2hY7ixUJH24Q4aYjycd`   |
-| Testnet   | `DVDvrhK9vFQ8JtXpv3pSskSQahuuQKPuWpJakHT4EJne`   |
-| Mainnet   | *Not yet deployed*                               |
+| Network   | Program ID                                       | FIGHT Token Mint                                 |
+|-----------|--------------------------------------------------|--------------------------------------------------|
+| Testnet   | `DVDvrhK9vFQ8JtXpv3pSskSQahuuQKPuWpJakHT4EJne`   | `ATQgP3cCA6srjsXe5wLXQPAHzimi2tSJ7GhH8MXJgYNE`   |
+| Mainnet   | *Not yet deployed*                               | *Not yet deployed*                               |
 
 ## Commands
 
@@ -112,7 +110,7 @@ Without this, IDL generation fails with cryptic errors about missing `DISCRIMINA
 
 ### Test Setup
 - Run `yarn install` before `anchor test` to install TypeScript dependencies
-- Tests create a mock FIGHT token mint on localnet since the real mint (`8f62NyJG...`) only exists on mainnet/devnet
+- Tests always create a fresh mock FIGHT token mint (the mint address is passed at `initialize` time, not hardcoded)
 
 ## Error Codes
 

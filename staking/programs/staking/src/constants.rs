@@ -18,10 +18,6 @@ pub const USER_STAKE_LEN: usize = DISCRIMINATOR_SIZE + // discriminator
     U64_SIZE + // balance
     U8_SIZE; // bump
 
-/// FIGHT Token Mint address
-/// This is the native SPL token mint for FIGHT tokens
-pub const FIGHT_TOKEN_MINT: &str = "8f62NyJGo7He5uWeveTA2JJQf4xzf8aqxkmzxRQ3mxfU";
-
 /// PDA seeds for the staking program
 pub mod seeds {
     /// Seed for the state PDA
