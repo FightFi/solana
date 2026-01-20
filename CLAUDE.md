@@ -42,7 +42,7 @@ yarn run lint:fix      # Auto-fix formatting
 staking/programs/staking/src/
 ├── lib.rs              # Program entry - dispatches to instruction handlers
 ├── constants.rs        # PDA seeds, account sizes, FIGHT mint address
-├── errors.rs           # Custom error codes (ContractPaused, InsufficientBalance, etc.)
+├── errors.rs           # Custom error codes (see Error Codes section below)
 ├── events.rs           # On-chain events (Staked, Unstaked, Paused, Unpaused)
 ├── state/
 │   ├── state.rs        # Global State account (mint, owner, total_staked, paused)
@@ -77,9 +77,26 @@ staking/programs/staking/src/
 
 ## Configuration
 
-- **Cluster:** localnet (see `Anchor.toml`)
-- **Wallet:** `~/.config/solana/id.json`
+- **Cluster:** localnet (default, see `Anchor.toml`)
+- **Wallet:** `~/.config/solana/testnet-wallet.json`
 - **Test framework:** Mocha + Chai (`tests/staking.ts`)
+
+## Building for Different Networks
+
+Program ID is selected at compile time via Cargo features:
+
+```bash
+# Localnet (default)
+anchor build
+
+# Testnet
+anchor build -- --features testnet
+
+# Mainnet
+anchor build -- --features mainnet
+```
+
+The `lib.rs` uses conditional compilation to select the correct program ID based on the feature flag.
 
 ## Known Issues & Workarounds
 
@@ -96,6 +113,31 @@ Without this, IDL generation fails with cryptic errors about missing `DISCRIMINA
 ### Test Setup
 - Run `yarn install` before `anchor test` to install TypeScript dependencies
 - Tests create a mock FIGHT token mint on localnet since the real mint (`8f62NyJG...`) only exists on mainnet/devnet
+
+## Error Codes
+
+| Code | Name | Description |
+|------|------|-------------|
+| 6000 | `ContractPaused` | Staking is paused (unstaking still allowed) |
+| 6001 | `NotPaused` | Cannot unpause - contract is not paused |
+| 6002 | `AlreadyPaused` | Cannot pause - contract is already paused |
+| 6003 | `ZeroAmount` | Amount must be greater than zero |
+| 6004 | `InsufficientBalance` | User doesn't have enough staked balance |
+| 6005 | `Unauthorized` | Only owner can perform this action |
+| 6006 | `InvalidTokenMint` | Wrong token mint provided |
+| 6007 | `InvalidTokenAccount` | Invalid token account |
+| 6008 | `InvalidUser` | User mismatch in UserStake account |
+| 6009 | `Overflow` | Arithmetic overflow |
+| 6010 | `Underflow` | Arithmetic underflow |
+
+## Events
+
+All events include `timestamp` (i64) and `slot` (u64) fields.
+
+- **Staked:** `user`, `amount`, `user_balance_before`, `user_balance_after`, `total_staked_after`
+- **Unstaked:** `user`, `amount`, `user_balance_before`, `user_balance_after`, `total_staked_after`
+- **Paused:** emitted when owner pauses contract
+- **Unpaused:** emitted when owner unpauses contract
 
 ## Reference
 
