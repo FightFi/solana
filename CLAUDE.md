@@ -8,8 +8,15 @@ Solana staking program built with Anchor framework (Rust). Users stake FIGHT tok
 
 - **Language:** Rust (Anchor v0.32.1), TypeScript (tests)
 - **Rust Version:** 1.89.0 (pinned in `rust-toolchain.toml`)
-- **Program ID:** `9aZRVnxzy8kRiq8mHcfFBj1BX2hY7ixUJH24Q4aYjycd`
 - **FIGHT Token Mint:** `8f62NyJGo7He5uWeveTA2JJQf4xzf8aqxkmzxRQ3mxfU`
+
+### Program IDs
+
+| Network   | Program ID                                       |
+|-----------|--------------------------------------------------|
+| Localnet  | `9aZRVnxzy8kRiq8mHcfFBj1BX2hY7ixUJH24Q4aYjycd`   |
+| Testnet   | `DVDvrhK9vFQ8JtXpv3pSskSQahuuQKPuWpJakHT4EJne`   |
+| Mainnet   | *Not yet deployed*                               |
 
 ## Commands
 

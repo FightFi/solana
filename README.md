@@ -195,11 +195,13 @@ const userStake = await program.account.userStake.fetch(userStakePda);
 console.log("Staked balance:", userStake.balance.toNumber());
 ```
 
-## Program ID
+## Program IDs
 
-```
-9aZRVnxzy8kRiq8mHcfFBj1BX2hY7ixUJH24Q4aYjycd
-```
+| Network   | Program ID                                       |
+|-----------|--------------------------------------------------|
+| Localnet  | `9aZRVnxzy8kRiq8mHcfFBj1BX2hY7ixUJH24Q4aYjycd`   |
+| Testnet   | `DVDvrhK9vFQ8JtXpv3pSskSQahuuQKPuWpJakHT4EJne`   |
+| Mainnet   | *Not yet deployed*                               |
 
 ## FIGHT Token Mint
 
