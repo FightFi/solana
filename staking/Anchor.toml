@@ -14,6 +14,11 @@ staking = "DVDvrhK9vFQ8JtXpv3pSskSQahuuQKPuWpJakHT4EJne"
 [registry]
 url = "https://api.apr.dev"
 
+[metadata]
+name = "FIGHT Staking"
+description = "Stake FIGHT tokens with owner-controlled pause functionality"
+version = "0.1.0"
+
 [provider]
 cluster = "localnet"
 wallet = "~/.config/solana/testnet-wallet.json"
