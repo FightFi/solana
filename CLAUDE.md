@@ -137,6 +137,61 @@ All events include `timestamp` (i64) and `slot` (u64) fields.
 - **Paused:** emitted when owner pauses contract
 - **Unpaused:** emitted when owner unpauses contract
 
+## Frontend Integration (FightFi PWA)
+
+The Solana staking program is integrated into the FightFi PWA at `/Users/aukaitirrell/Projects/FightFi-Web/apps/fightfi-pwa`.
+
+### Key Files
+
+| File | Purpose |
+|------|---------|
+| `src/common/components/solana/solana-wallet-provider.tsx` | Wraps app with Solana wallet adapter (ConnectionProvider + WalletProvider) |
+| `src/common/hooks/use-solana-staking.tsx` | Hook for stake/unstake operations via Anchor |
+| `src/common/hooks/use-solana-fight-balance.tsx` | Hook for user's FIGHT token balance |
+| `src/common/config/solana.config.ts` | Network config (program ID, mint address, RPC endpoint) |
+| `src/common/idl/staking.json` | Program IDL (copy from `staking/target/idl/staking.json`) |
+| `src/common/idl/staking.ts` | TypeScript types (copy from `staking/target/types/staking.ts`) |
+| `src/modules/(quest)/stake-fight/components/stake-interface.tsx` | Main staking UI (supports both Solana and BSC) |
+| `src/modules/(quest)/stake-fight/components/unstake-modal.tsx` | Unstake modal (supports both chains) |
+
+### Wallet Support
+
+The app uses Solana Wallet Adapter with `autoConnect: true`:
+- **Phantom** - via `PhantomWalletAdapter`
+- **Solflare** - via `SolflareWalletAdapter`
+- **Backpack** - via `BackpackWalletAdapter`
+- **OKX** - auto-detected via Wallet Standard
+
+### Architecture
+
+```
+App.tsx
+└── SolanaWalletProvider (ConnectionProvider + WalletProvider)
+    └── Components using useWallet(), useSolanaStaking(), etc.
+```
+
+The staking interface (`stake-interface.tsx`) supports both chains:
+- **BSC**: Uses `useRainbowStaking` + wagmi
+- **Solana**: Uses `useSolanaStaking` + Solana wallet adapter
+
+Reward data comes from a shared backend API (`useGetStakingRewardQuery`) for both chains.
+
+### Updating the IDL
+
+After modifying the Solana program:
+1. Run `anchor build` in `staking/`
+2. Copy `target/idl/staking.json` → PWA's `src/common/idl/staking.json`
+3. Copy `target/types/staking.ts` → PWA's `src/common/idl/staking.ts`
+
+### Environment Variables (PWA)
+
+```env
+SOLANA_NETWORK=testnet  # or mainnet
+SOLANA_TESTNET_PROGRAM_ID=DVDvrhK9vFQ8JtXpv3pSskSQahuuQKPuWpJakHT4EJne
+SOLANA_TESTNET_FIGHT_MINT_ADDRESS=ATQgP3cCA6srjsXe5wLXQPAHzimi2tSJ7GhH8MXJgYNE
+SOLANA_TESTNET_RPC_ENDPOINT=https://api.testnet.solana.com
+```
+
 ## Reference
 
 Original Solidity contract kept at `staking/staking.sol` for feature parity verification.
