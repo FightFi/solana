@@ -15,12 +15,13 @@ import { expect } from "chai";
 describe("staking", () => {
   // Configure the client to use the local cluster
   anchor.setProvider(anchor.AnchorProvider.env());
-  const provider = anchor.getProvider();
+  const provider = anchor.getProvider() as anchor.AnchorProvider;
 
   const program = anchor.workspace.staking as Program<Staking>;
 
   // Test accounts
-  let owner: Keypair;
+  // Owner uses the provider wallet (matches EXPECTED_OWNER in constants.rs) [L-2]
+  const owner = (provider.wallet as anchor.Wallet).payer;
   let user1: Keypair;
   let user2: Keypair;
   let fightTokenMint: PublicKey;
@@ -51,16 +52,11 @@ describe("staking", () => {
   };
 
   before(async () => {
-    // Generate test keypairs
-    owner = Keypair.generate();
+    // Generate test keypairs (owner uses provider wallet - see above)
     user1 = Keypair.generate();
     user2 = Keypair.generate();
 
-    // Airdrop SOL to test accounts
-    await provider.connection.requestAirdrop(
-      owner.publicKey,
-      2 * anchor.web3.LAMPORTS_PER_SOL
-    );
+    // Airdrop SOL to test accounts (owner/provider wallet is pre-funded)
     await provider.connection.requestAirdrop(
       user1.publicKey,
       2 * anchor.web3.LAMPORTS_PER_SOL
@@ -75,6 +71,7 @@ describe("staking", () => {
 
     // Create a test mint for localnet testing
     console.log("Creating test FIGHT token mint...");
+    console.log("Owner (EXPECTED_OWNER):", owner.publicKey.toString());
     fightTokenMint = await createMint(
       provider.connection,
       owner,
@@ -95,8 +92,9 @@ describe("staking", () => {
 
   it("Initializes the staking program", async () => {
     try {
+      // Note: No owner parameter - payer becomes owner (audit fix [L-2] [I-3])
       const tx = await program.methods
-        .initialize(owner.publicKey)
+        .initialize()
         .accounts({
           state: statePda,
           fightTokenMint: fightTokenMint,
