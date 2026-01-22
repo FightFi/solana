@@ -11,6 +11,9 @@ staking = "9aZRVnxzy8kRiq8mHcfFBj1BX2hY7ixUJH24Q4aYjycd"
 [programs.testnet]
 staking = "DVDvrhK9vFQ8JtXpv3pSskSQahuuQKPuWpJakHT4EJne"
 
+[programs.devnet]
+staking = "DVDvrhK9vFQ8JtXpv3pSskSQahuuQKPuWpJakHT4EJne"
+
 [registry]
 url = "https://api.apr.dev"
 

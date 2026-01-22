@@ -13,8 +13,11 @@ Solana staking program built with Anchor framework (Rust). Users stake FIGHT tok
 
 | Network   | Program ID                                       | FIGHT Token Mint                                 |
 |-----------|--------------------------------------------------|--------------------------------------------------|
+| Devnet    | `DVDvrhK9vFQ8JtXpv3pSskSQahuuQKPuWpJakHT4EJne`   | `H5HwNswMvoHXHXqYuk1BkxXaiC3azj8gjy7qhwsdQLDt`   |
 | Testnet   | `DVDvrhK9vFQ8JtXpv3pSskSQahuuQKPuWpJakHT4EJne`   | `ATQgP3cCA6srjsXe5wLXQPAHzimi2tSJ7GhH8MXJgYNE`   |
 | Mainnet   | *Not yet deployed*                               | *Not yet deployed*                               |
+
+> **Note:** Program ID is the same on devnet and testnet (same keypair used for deployment).
 
 ## Commands
 
@@ -159,7 +162,7 @@ The Solana staking program is integrated into the FightFi PWA at `/Users/aukaiti
 The app uses Solana Wallet Adapter with `autoConnect: true`:
 - **Phantom** - via `PhantomWalletAdapter`
 - **Solflare** - via `SolflareWalletAdapter`
-- **Backpack** - via `BackpackWalletAdapter`
+- **Backpack** - auto-detected via Wallet Standard
 - **OKX** - auto-detected via Wallet Standard
 
 ### Architecture
