@@ -132,7 +132,7 @@ Different program IDs per network:
 staking = "9aZRVnxzy8kRiq8mHcfFBj1BX2hY7ixUJH24Q4aYjycd"
 
 [programs.testnet]
-staking = "DVDvrhK9vFQ8JtXpv3pSskSQahuuQKPuWpJakHT4EJne"
+staking = "5HWYY9fuyvCrvV66GCg5hPbf7XARCcybuQrdJGGEbEVH"
 
 [programs.mainnet]
 staking = "<YOUR_MAINNET_PROGRAM_ID>"
@@ -147,7 +147,7 @@ Program ID selected at compile time:
 declare_id!("<YOUR_MAINNET_PROGRAM_ID>");
 
 #[cfg(feature = "testnet")]
-declare_id!("DVDvrhK9vFQ8JtXpv3pSskSQahuuQKPuWpJakHT4EJne");
+declare_id!("5HWYY9fuyvCrvV66GCg5hPbf7XARCcybuQrdJGGEbEVH");
 
 #[cfg(not(any(feature = "mainnet", feature = "testnet")))]
 declare_id!("9aZRVnxzy8kRiq8mHcfFBj1BX2hY7ixUJH24Q4aYjycd");

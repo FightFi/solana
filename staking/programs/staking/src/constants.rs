@@ -23,10 +23,10 @@ pub const USER_STAKE_LEN: usize = DISCRIMINATOR_SIZE + // discriminator
 /// This prevents front-running attacks by ensuring only the expected admin can initialize [L-2]
 /// Update this value before deploying to each network
 #[cfg(feature = "mainnet")]
-pub const EXPECTED_OWNER: &str = "YOUR_MAINNET_OWNER_PUBKEY_HERE";
+pub const EXPECTED_OWNER: &str = "65mxnibS4DL2qqL24GpMJqtNxgEzWgnARTMvXv5SePUb";
 
 #[cfg(feature = "testnet")]
-pub const EXPECTED_OWNER: &str = "YOUR_TESTNET_OWNER_PUBKEY_HERE";
+pub const EXPECTED_OWNER: &str = "Dq8RjxwfD1XT4AXNo5pxx6grRNruj7gdSChChQxARMe1";
 
 // Localnet uses the testnet-wallet.json pubkey configured in Anchor.toml
 #[cfg(not(any(feature = "mainnet", feature = "testnet")))]

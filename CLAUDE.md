@@ -13,9 +13,9 @@ Solana staking program built with Anchor framework (Rust). Users stake FIGHT tok
 
 | Network   | Program ID                                       | FIGHT Token Mint                                 |
 |-----------|--------------------------------------------------|--------------------------------------------------|
-| Devnet    | `DVDvrhK9vFQ8JtXpv3pSskSQahuuQKPuWpJakHT4EJne`   | `H5HwNswMvoHXHXqYuk1BkxXaiC3azj8gjy7qhwsdQLDt`   |
-| Testnet   | `DVDvrhK9vFQ8JtXpv3pSskSQahuuQKPuWpJakHT4EJne`   | `ATQgP3cCA6srjsXe5wLXQPAHzimi2tSJ7GhH8MXJgYNE`   |
-| Mainnet   | *Not yet deployed*                               | *Not yet deployed*                               |
+| Devnet    | `5HWYY9fuyvCrvV66GCg5hPbf7XARCcybuQrdJGGEbEVH`   | `H5HwNswMvoHXHXqYuk1BkxXaiC3azj8gjy7qhwsdQLDt`   |
+| Testnet   | `5HWYY9fuyvCrvV66GCg5hPbf7XARCcybuQrdJGGEbEVH`   | `ATQgP3cCA6srjsXe5wLXQPAHzimi2tSJ7GhH8MXJgYNE`   |
+| Mainnet   | `4D9WKeKXKCEjzZfuLgU3H7P9J1cJ1HZ2fPURAX8ceqKc`   | `8f62NyJGo7He5uWeveTA2JJQf4xzf8aqxkmzxRQ3mxfU`   |
 
 > **Note:** Program ID is the same on devnet and testnet (same keypair used for deployment).
 

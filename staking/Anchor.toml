@@ -9,10 +9,13 @@ skip-lint = false
 staking = "9aZRVnxzy8kRiq8mHcfFBj1BX2hY7ixUJH24Q4aYjycd"
 
 [programs.testnet]
-staking = "DVDvrhK9vFQ8JtXpv3pSskSQahuuQKPuWpJakHT4EJne"
+staking = "5HWYY9fuyvCrvV66GCg5hPbf7XARCcybuQrdJGGEbEVH"
 
 [programs.devnet]
-staking = "DVDvrhK9vFQ8JtXpv3pSskSQahuuQKPuWpJakHT4EJne"
+staking = "5HWYY9fuyvCrvV66GCg5hPbf7XARCcybuQrdJGGEbEVH"
+
+[programs.mainnet]
+staking = "4D9WKeKXKCEjzZfuLgU3H7P9J1cJ1HZ2fPURAX8ceqKc"
 
 [registry]
 url = "https://api.apr.dev"

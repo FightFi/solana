@@ -19,12 +19,10 @@ import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
 import { Staking } from "../target/types/staking";
 import {
-  TOKEN_PROGRAM_ID,
-  ASSOCIATED_TOKEN_PROGRAM_ID,
   getAssociatedTokenAddress,
   getAccount,
 } from "@solana/spl-token";
-import { PublicKey, SystemProgram, Connection, Keypair } from "@solana/web3.js";
+import { PublicKey, Connection, Keypair, ComputeBudgetProgram } from "@solana/web3.js";
 import * as fs from "fs";
 import * as os from "os";
 import * as dotenv from "dotenv";
@@ -151,10 +149,15 @@ async function main() {
   console.log("\n🔧 Setting up Anchor...");
 
   // The provider combines connection + wallet for signing transactions
+  // Using maxRetries and skipPreflight for better testnet reliability
   const provider = new anchor.AnchorProvider(
     connection,
     new anchor.Wallet(wallet),
-    { commitment: "confirmed" }
+    {
+      commitment: "confirmed",
+      preflightCommitment: "confirmed",
+      skipPreflight: false,
+    }
   );
   anchor.setProvider(provider);
 
@@ -224,7 +227,7 @@ async function main() {
 
     try {
       const tx = await program.methods
-        .initialize(wallet.publicKey) // Set ourselves as owner
+        .initialize() // Owner is automatically set to payer per [L-2] audit fix
         .accountsPartial({
           fightTokenMint: FIGHT_MINT,
           payer: wallet.publicKey,
@@ -259,6 +262,9 @@ async function main() {
   console.log("   - Update total_staked in State");
 
   try {
+    // Add priority fee for faster confirmation on congested testnet
+    const priorityFeeIx = ComputeBudgetProgram.setComputeUnitPrice({ microLamports: 50000 });
+
     const tx = await program.methods
       .stake(stakeAmount)
       .accountsPartial({
@@ -266,7 +272,8 @@ async function main() {
         userTokenAccount: userTokenAccount,
         vaultTokenAccount: vaultTokenAccount,
       })
-      .rpc();
+      .preInstructions([priorityFeeIx])
+      .rpc({ commitment: "confirmed", maxRetries: 5 });
 
     console.log(`   ✅ Staked! Tx: ${tx}`);
     console.log(`   View on explorer: https://explorer.solana.com/tx/${tx}?cluster=testnet`);
@@ -300,6 +307,9 @@ async function main() {
   console.log("   - Update total_staked in State");
 
   try {
+    // Add priority fee for faster confirmation on congested testnet
+    const unstakePriorityFeeIx = ComputeBudgetProgram.setComputeUnitPrice({ microLamports: 50000 });
+
     const tx = await program.methods
       .unstake(unstakeAmount)
       .accountsPartial({
@@ -307,7 +317,8 @@ async function main() {
         userTokenAccount: userTokenAccount,
         vaultTokenAccount: vaultTokenAccount,
       })
-      .rpc();
+      .preInstructions([unstakePriorityFeeIx])
+      .rpc({ commitment: "confirmed", maxRetries: 5 });
 
     console.log(`   ✅ Unstaked! Tx: ${tx}`);
     console.log(`   View on explorer: https://explorer.solana.com/tx/${tx}?cluster=testnet`);

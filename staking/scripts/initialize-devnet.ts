@@ -1,63 +1,103 @@
 /**
  * Initialize the staking program on devnet
  */
-
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
-import { PublicKey } from "@solana/web3.js";
 import { Staking } from "../target/types/staking";
+import { PublicKey, Connection, Keypair, ComputeBudgetProgram } from "@solana/web3.js";
+import * as fs from "fs";
+import * as os from "os";
 
-const DEVNET_FIGHT_MINT = new PublicKey("H5HwNswMvoHXHXqYuk1BkxXaiC3azj8gjy7qhwsdQLDt");
+// Devnet configuration
+const DEVNET_RPC_URL = "https://api.devnet.solana.com";
+const PROGRAM_ID = new PublicKey("5HWYY9fuyvCrvV66GCg5hPbf7XARCcybuQrdJGGEbEVH");
+const FIGHT_MINT = new PublicKey("H5HwNswMvoHXHXqYuk1BkxXaiC3azj8gjy7qhwsdQLDt");
+const WALLET_PATH = "~/.config/solana/testnet-wallet.json";
+
+function loadWallet(): Keypair {
+  const walletPath = WALLET_PATH.replace("~", os.homedir());
+  const walletData = JSON.parse(fs.readFileSync(walletPath, "utf-8"));
+  return Keypair.fromSecretKey(new Uint8Array(walletData));
+}
 
 async function main() {
-  // Configure the client to use devnet
-  const provider = anchor.AnchorProvider.env();
+  console.log("=".repeat(60));
+  console.log("Initialize Staking Program on Devnet");
+  console.log("=".repeat(60));
+
+  const connection = new Connection(DEVNET_RPC_URL, "confirmed");
+  const wallet = loadWallet();
+
+  console.log(`\nWallet: ${wallet.publicKey.toBase58()}`);
+  console.log(`Program ID: ${PROGRAM_ID.toBase58()}`);
+  console.log(`FIGHT Mint: ${FIGHT_MINT.toBase58()}`);
+
+  const balance = await connection.getBalance(wallet.publicKey);
+  console.log(`SOL Balance: ${(balance / 1e9).toFixed(4)} SOL`);
+
+  const provider = new anchor.AnchorProvider(
+    connection,
+    new anchor.Wallet(wallet),
+    { commitment: "confirmed" }
+  );
   anchor.setProvider(provider);
 
-  const program = anchor.workspace.Staking as Program<Staking>;
-  const payer = provider.wallet;
-
-  console.log("Program ID:", program.programId.toBase58());
-  console.log("Payer:", payer.publicKey.toBase58());
-  console.log("FIGHT Token Mint:", DEVNET_FIGHT_MINT.toBase58());
+  const program = new Program<Staking>(
+    require("../target/idl/staking.json"),
+    provider
+  );
 
   // Derive State PDA
   const [statePda] = PublicKey.findProgramAddressSync(
     [Buffer.from("state")],
-    program.programId
+    PROGRAM_ID
   );
-
-  console.log("\nState PDA:", statePda.toBase58());
+  console.log(`\nState PDA: ${statePda.toBase58()}`);
 
   // Check if already initialized
   try {
-    const stateAccount = await program.account.state.fetch(statePda);
-    console.log("\n⚠️  Program already initialized!");
-    console.log("Owner:", stateAccount.owner.toBase58());
-    console.log("FIGHT Mint:", stateAccount.fightTokenMint.toBase58());
-    console.log("Total Staked:", stateAccount.totalStaked.toString());
-    console.log("Paused:", stateAccount.paused);
+    const state = await (program.account as any).state.fetch(statePda);
+    console.log("\nProgram already initialized!");
+    console.log(`   Owner: ${state.owner.toBase58()}`);
+    console.log(`   FIGHT Mint: ${state.fightTokenMint.toBase58()}`);
+    console.log(`   Vault: ${state.vaultTokenAccount.toBase58()}`);
+    console.log(`   Total Staked: ${state.totalStaked.toString()}`);
+    console.log(`   Paused: ${state.paused}`);
     return;
   } catch (e) {
-    // State account doesn't exist, proceed with initialization
+    console.log("\nProgram not yet initialized. Initializing now...");
   }
 
-  console.log("\nInitializing staking program...");
-
+  // Initialize with priority fee for better confirmation
   try {
-    const tx = await program.methods
-      .initialize(payer.publicKey)
-      .accounts({
-        fightTokenMint: DEVNET_FIGHT_MINT,
-        payer: payer.publicKey,
-      })
-      .rpc();
+    const priorityFeeIx = ComputeBudgetProgram.setComputeUnitPrice({ microLamports: 50000 });
 
-    console.log("✅ Initialization successful!");
-    console.log("Transaction signature:", tx);
-  } catch (e) {
-    console.error("❌ Initialization failed:", e);
-    throw e;
+    const tx = await program.methods
+      .initialize() // No args - owner is set to payer per [L-2] audit fix
+      .accountsPartial({
+        fightTokenMint: FIGHT_MINT,
+        payer: wallet.publicKey,
+      })
+      .preInstructions([priorityFeeIx])
+      .rpc({ commitment: "confirmed" });
+
+    console.log(`\nInitialized! Tx: ${tx}`);
+    console.log(`View on explorer: https://explorer.solana.com/tx/${tx}?cluster=devnet`);
+
+    // Verify initialization
+    const state = await (program.account as any).state.fetch(statePda);
+    console.log(`\n=== Initialized State ===`);
+    console.log(`Owner: ${state.owner.toBase58()}`);
+    console.log(`FIGHT Mint: ${state.fightTokenMint.toBase58()}`);
+    console.log(`Vault: ${state.vaultTokenAccount.toBase58()}`);
+    console.log(`Total Staked: ${state.totalStaked.toString()}`);
+    console.log(`Paused: ${state.paused}`);
+  } catch (e: any) {
+    console.log(`\nInitialize failed: ${e.message}`);
+    if (e.logs) {
+      console.log("Logs:");
+      e.logs.forEach((log: string) => console.log("  ", log));
+    }
   }
 }
 
