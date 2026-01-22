@@ -42,15 +42,16 @@ pub fn unstake(ctx: Context<Unstake>, amount: u64) -> Result<()> {
     let cpi_ctx = CpiContext::new_with_signer(cpi_program, cpi_accounts, signer);
     token::transfer(cpi_ctx, amount)?;
 
-    // Emit event
+    // Emit event (fetch clock once to avoid redundant syscalls [I-4])
+    let clock = Clock::get()?;
     emit!(Unstaked {
         user: ctx.accounts.user.key(),
         amount,
         user_balance_before,
         user_balance_after: user_stake.balance,
         total_staked_after: state.total_staked,
-        timestamp: Clock::get()?.unix_timestamp,
-        slot: Clock::get()?.slot,
+        timestamp: clock.unix_timestamp,
+        slot: clock.slot,
     });
 
     msg!("Unstaked {} tokens", amount);
@@ -94,10 +95,10 @@ pub struct Unstake<'info> {
     )]
     pub vault_authority: AccountInfo<'info>,
 
+    /// Canonical vault token account - must match address stored in state [L-3]
     #[account(
         mut,
-        constraint = vault_token_account.mint == state.fight_token_mint @ StakingError::InvalidTokenMint,
-        constraint = vault_token_account.owner == vault_authority.key() @ StakingError::InvalidTokenAccount,
+        constraint = vault_token_account.key() == state.vault_token_account @ StakingError::InvalidTokenAccount,
     )]
     pub vault_token_account: Account<'info, TokenAccount>,
 
