@@ -13,15 +13,17 @@ pub use errors::*;
 pub use events::*;
 
 // Program ID is selected at compile time based on target network
+// Build with: anchor build -- --features devnet
 // Build with: anchor build -- --features testnet
 // Build with: anchor build -- --features mainnet
 #[cfg(feature = "mainnet")]
 declare_id!("4D9WKeKXKCEjzZfuLgU3H7P9J1cJ1HZ2fPURAX8ceqKc");
 
-#[cfg(feature = "testnet")]
+// Devnet and testnet share the same program ID
+#[cfg(any(feature = "testnet", feature = "devnet"))]
 declare_id!("5HWYY9fuyvCrvV66GCg5hPbf7XARCcybuQrdJGGEbEVH");
 
-#[cfg(not(any(feature = "mainnet", feature = "testnet")))]
+#[cfg(not(any(feature = "mainnet", feature = "testnet", feature = "devnet")))]
 declare_id!("9aZRVnxzy8kRiq8mHcfFBj1BX2hY7ixUJH24Q4aYjycd");
 
 #[program]

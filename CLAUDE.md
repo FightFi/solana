@@ -13,11 +13,26 @@ Solana staking program built with Anchor framework (Rust). Users stake FIGHT tok
 
 | Network   | Program ID                                       | FIGHT Token Mint                                 |
 |-----------|--------------------------------------------------|--------------------------------------------------|
+| Localnet  | `9aZRVnxzy8kRiq8mHcfFBj1BX2hY7ixUJH24Q4aYjycd`   | *(created at runtime during tests)*              |
 | Devnet    | `5HWYY9fuyvCrvV66GCg5hPbf7XARCcybuQrdJGGEbEVH`   | `H5HwNswMvoHXHXqYuk1BkxXaiC3azj8gjy7qhwsdQLDt`   |
 | Testnet   | `5HWYY9fuyvCrvV66GCg5hPbf7XARCcybuQrdJGGEbEVH`   | `ATQgP3cCA6srjsXe5wLXQPAHzimi2tSJ7GhH8MXJgYNE`   |
 | Mainnet   | `4D9WKeKXKCEjzZfuLgU3H7P9J1cJ1HZ2fPURAX8ceqKc`   | `8f62NyJGo7He5uWeveTA2JJQf4xzf8aqxkmzxRQ3mxfU`   |
 
 > **Note:** Program ID is the same on devnet and testnet (same keypair used for deployment).
+
+### Mainnet Deployment Details
+
+| Item | Address |
+|------|---------|
+| **Program ID** | `4D9WKeKXKCEjzZfuLgU3H7P9J1cJ1HZ2fPURAX8ceqKc` |
+| **FIGHT Mint** | `8f62NyJGo7He5uWeveTA2JJQf4xzf8aqxkmzxRQ3mxfU` |
+| **Owner** | `65mxnibS4DL2qqL24GpMJqtNxgEzWgnARTMvXv5SePUb` |
+| **State PDA** | `ELhG31zw9rYV3oyzAvew4fnp2FvDd6sQaweBmhaRg2HR` |
+| **Vault** | `DaAkvBFr8CWXEEvzT9zTn5FyHFvwm5Zya2sprfq8KsNX` |
+| **IDL Account** | `AepV2gojLrNtpabrZ9GJgBqMTywmdc5WmnqBcJYaaGuq` |
+
+- **Explorer**: https://explorer.solana.com/address/4D9WKeKXKCEjzZfuLgU3H7P9J1cJ1HZ2fPURAX8ceqKc
+- **Deployment Docs**: See `docs/MAINNET_DEPLOYMENT.md`
 
 ## Commands
 
@@ -90,6 +105,9 @@ Program ID is selected at compile time via Cargo features:
 # Localnet (default)
 anchor build
 
+# Devnet (shares program ID with testnet)
+anchor build -- --features devnet
+
 # Testnet
 anchor build -- --features testnet
 
@@ -98,6 +116,8 @@ anchor build -- --features mainnet
 ```
 
 The `lib.rs` uses conditional compilation to select the correct program ID based on the feature flag.
+
+> **Note:** Devnet and testnet share the same program ID (`5HWYY9fuyvCrvV66GCg5hPbf7XARCcybuQrdJGGEbEVH`) but have different FIGHT token mints.
 
 ## Known Issues & Workarounds
 
@@ -189,10 +209,23 @@ After modifying the Solana program:
 ### Environment Variables (PWA)
 
 ```env
-SOLANA_NETWORK=testnet  # or mainnet
-SOLANA_TESTNET_PROGRAM_ID=DVDvrhK9vFQ8JtXpv3pSskSQahuuQKPuWpJakHT4EJne
+# Testnet
+SOLANA_NETWORK=testnet
+SOLANA_TESTNET_PROGRAM_ID=5HWYY9fuyvCrvV66GCg5hPbf7XARCcybuQrdJGGEbEVH
 SOLANA_TESTNET_FIGHT_MINT_ADDRESS=ATQgP3cCA6srjsXe5wLXQPAHzimi2tSJ7GhH8MXJgYNE
 SOLANA_TESTNET_RPC_ENDPOINT=https://api.testnet.solana.com
+
+# Devnet
+SOLANA_NETWORK=devnet
+SOLANA_DEVNET_PROGRAM_ID=5HWYY9fuyvCrvV66GCg5hPbf7XARCcybuQrdJGGEbEVH
+SOLANA_DEVNET_FIGHT_MINT_ADDRESS=H5HwNswMvoHXHXqYuk1BkxXaiC3azj8gjy7qhwsdQLDt
+SOLANA_DEVNET_RPC_ENDPOINT=https://api.devnet.solana.com
+
+# Mainnet
+SOLANA_NETWORK=mainnet-beta
+SOLANA_MAINNET_PROGRAM_ID=4D9WKeKXKCEjzZfuLgU3H7P9J1cJ1HZ2fPURAX8ceqKc
+SOLANA_MAINNET_FIGHT_MINT_ADDRESS=8f62NyJGo7He5uWeveTA2JJQf4xzf8aqxkmzxRQ3mxfU
+SOLANA_MAINNET_RPC_ENDPOINT=https://api.mainnet-beta.solana.com
 ```
 
 ## Reference

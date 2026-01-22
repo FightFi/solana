@@ -25,11 +25,12 @@ pub const USER_STAKE_LEN: usize = DISCRIMINATOR_SIZE + // discriminator
 #[cfg(feature = "mainnet")]
 pub const EXPECTED_OWNER: &str = "65mxnibS4DL2qqL24GpMJqtNxgEzWgnARTMvXv5SePUb";
 
-#[cfg(feature = "testnet")]
+// Devnet and testnet share the same owner (testnet-wallet.json)
+#[cfg(any(feature = "testnet", feature = "devnet"))]
 pub const EXPECTED_OWNER: &str = "Dq8RjxwfD1XT4AXNo5pxx6grRNruj7gdSChChQxARMe1";
 
 // Localnet uses the testnet-wallet.json pubkey configured in Anchor.toml
-#[cfg(not(any(feature = "mainnet", feature = "testnet")))]
+#[cfg(not(any(feature = "mainnet", feature = "testnet", feature = "devnet")))]
 pub const EXPECTED_OWNER: &str = "Dq8RjxwfD1XT4AXNo5pxx6grRNruj7gdSChChQxARMe1";
 
 /// PDA seeds for the staking program
