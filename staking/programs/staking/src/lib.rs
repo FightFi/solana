@@ -29,8 +29,9 @@ pub mod staking {
     use super::*;
 
     /// Initialize the staking program
-    pub fn initialize(ctx: Context<Initialize>, owner: Pubkey) -> Result<()> {
-        instructions::initialize(ctx, owner)
+    /// Security: Owner is set to payer to prevent front-running [L-2] [I-3]
+    pub fn initialize(ctx: Context<Initialize>) -> Result<()> {
+        instructions::initialize(ctx)
     }
 
     /// Stake FIGHT tokens
