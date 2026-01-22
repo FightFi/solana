@@ -1,5 +1,16 @@
 use anchor_lang::prelude::*;
 
+/// Event emitted when program is initialized [I-5]
+#[event]
+pub struct Initialized {
+    pub owner: Pubkey,
+    pub fight_token_mint: Pubkey,
+    pub vault_authority: Pubkey,
+    pub vault_token_account: Pubkey,
+    pub timestamp: i64,
+    pub slot: u64,
+}
+
 /// Event emitted when tokens are staked
 #[event]
 pub struct Staked {
