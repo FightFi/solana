@@ -1,3 +1,4 @@
+// example: yarn check-balance FWfWF6dARm8Rja29BFEdLZ53sghQThXQQ241ZzdRBM79
 import * as anchor from "@coral-xyz/anchor";
 import { Connection, PublicKey } from "@solana/web3.js";
 import * as dotenv from "dotenv";
@@ -52,9 +53,14 @@ async function main() {
     const userStakeAccount = await (program.account as any).userStake.fetch(userStakePda);
     const balance = userStakeAccount.balance;
     
-    // Assuming 9 decimals for FIGHT token (standard for SPL tokens usually, but let's check)
-    // Actually, let's just show the raw amount and a note.
-    console.log(`\nUnstakeable Balance: ${balance.toString()} (raw units)`);
+    // Format balance with 9 decimals
+    const balanceFormatted = (Number(balance) / 1e9).toLocaleString(undefined, {
+      minimumFractionDigits: 9,
+      maximumFractionDigits: 9,
+    });
+    
+    console.log(`Unstakeable Balance: ${balanceFormatted} FIGHT`);
+    console.log(`(Raw units: ${balance.toString()})`);
     
   } catch (err: any) {
     if (err.message && err.message.includes("Account does not exist")) {
