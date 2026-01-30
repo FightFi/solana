@@ -35,7 +35,7 @@ dotenv.config();
 // =============================================================================
 
 // Validate required environment variables
-const requiredEnvVars = ["PROGRAM_ID", "FIGHT_TOKEN_MINT", "SOLANA_RPC_URL", "WALLET_PATH"];
+const requiredEnvVars = ["PROGRAM_ID", "FIGHT_TOKEN_MINT", "SOLANA_RPC_URL", "WALLET_PRIVATE_KEY"];
 for (const envVar of requiredEnvVars) {
   if (!process.env[envVar]) {
     throw new Error(`Missing required environment variable: ${envVar}`);
@@ -43,13 +43,13 @@ for (const envVar of requiredEnvVars) {
 }
 
 // Your deployed program ID
-const PROGRAM_ID = new PublicKey(process.env.PROGRAM_ID!);
+const PROGRAM_ID = new PublicKey(process.env.PROGRAM_ID!.trim());
 
 // Your FIGHT token mint
-const FIGHT_MINT = new PublicKey(process.env.FIGHT_TOKEN_MINT!);
+const FIGHT_MINT = new PublicKey(process.env.FIGHT_TOKEN_MINT!.trim());
 
 // RPC endpoint
-const RPC_URL = process.env.SOLANA_RPC_URL!;
+const RPC_URL = process.env.SOLANA_RPC_URL!.trim();
 
 // =============================================================================
 // HELPER FUNCTIONS
@@ -61,10 +61,15 @@ const RPC_URL = process.env.SOLANA_RPC_URL!;
  * Path is configured in .env WALLET_PATH
  */
 function loadWallet(): Keypair {
-  // Expand ~ to home directory
-  const walletPath = process.env.WALLET_PATH!.replace("~", os.homedir());
-  const walletData = JSON.parse(fs.readFileSync(walletPath, "utf-8"));
-  return Keypair.fromSecretKey(new Uint8Array(walletData));
+  const privateKeyString = process.env.WALLET_PRIVATE_KEY!;
+  try {
+    // Attempt to parse as JSON array first (standard for solana-keygen files)
+    const walletData = JSON.parse(privateKeyString);
+    return Keypair.fromSecretKey(new Uint8Array(walletData));
+  } catch (e) {
+    // If not JSON, assume it's a base58 encoded string
+    return Keypair.fromSecretKey(anchor.utils.bytes.bs58.decode(privateKeyString));
+  }
 }
 
 /**
@@ -163,8 +168,9 @@ async function main() {
 
   // Load the program using IDL (Interface Definition Language)
   // The IDL describes all instructions, accounts, and types
+  const idl = require("../target/idl/staking.json");
   const program = new Program<Staking>(
-    require("../target/idl/staking.json"),
+    { ...idl, address: PROGRAM_ID.toBase58() },
     provider
   );
 
